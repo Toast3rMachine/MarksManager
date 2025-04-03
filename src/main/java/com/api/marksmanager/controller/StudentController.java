@@ -2,16 +2,13 @@ package com.api.marksmanager.controller;
 
 import com.api.marksmanager.dto.StudentDto;
 import com.api.marksmanager.entity.Student;
-import com.api.marksmanager.payload.request.RegisterRequest;
+import com.api.marksmanager.payload.request.CreateStudentRequest;
 import com.api.marksmanager.payload.response.MessageResponse;
 import com.api.marksmanager.repository.StudentRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/students")
@@ -21,17 +18,17 @@ public class StudentController {
     StudentRepository studentRepository;
 
     @PostMapping
-    public ResponseEntity<?> registerStudent(@Valid @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> registerStudent(@Valid @RequestBody CreateStudentRequest createStudentRequest) {
 
-        if (studentRepository.existsByStudentMail(registerRequest.getEmail())) {
+        if (studentRepository.existsByStudentMail(createStudentRequest.getEmail())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Email déjà attribué"));
         }
 
-        Student student = new Student(registerRequest.getFirstName(), registerRequest.getLastName(), registerRequest.getAge(), registerRequest.getEmail());
+        Student student = new Student(createStudentRequest.getFirstName(), createStudentRequest.getLastName(), createStudentRequest.getAge(), createStudentRequest.getEmail());
 
         studentRepository.save(student);
 
-        return ResponseEntity.ok(new MessageResponse("Nouvel étudiant enregistré avec succès"));
+        return ResponseEntity.ok(new MessageResponse("Nouvel.le étudiant.e enregistré.e avec succès"));
     }
 
     @GetMapping
@@ -59,7 +56,7 @@ public class StudentController {
                 student.setMarks(studentDto.getMarks());
             }
             studentRepository.save(student);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok().body(new MessageResponse("Etudiant mis à jour aec succès"));
         }
         return ResponseEntity.notFound().build();
     }

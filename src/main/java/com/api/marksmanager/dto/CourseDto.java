@@ -1,33 +1,15 @@
-package com.api.marksmanager.entity;
+package com.api.marksmanager.dto;
 
-import jakarta.persistence.*;
-
-import java.util.Date;
-
-@Entity
-@Table(name = "Course")
-public class Course {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", updatable = false)
+public class CourseDto {
     private Long id;
-
-    @Column(name = "name", nullable = false)
     private String name;
-
-    @Column(name = "date", nullable = false)
     private int date;
-
-    @Column(name = "start_hour", nullable = false)
     private int startHour;
-
-    @Column(name = "end_hour", nullable = false)
     private int endHour;
 
-    public Course() {}
+    public CourseDto() {}
 
-    public Course(String name, int date, int startHour, int endHour) {
+    public CourseDto(String name, int date, int startHour, int endHour) {
         this.name = name;
         this.date = date;
         this.startHour = startHour;
@@ -54,8 +36,8 @@ public class Course {
         return date;
     }
 
-    public void setDate(int day) {
-        this.date = day;
+    public void setDate(int date) {
+        this.date = date;
     }
 
     public int getStartHour() {
