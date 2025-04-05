@@ -1,76 +1,29 @@
 package com.api.marksmanager.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.Date;
+import java.util.Set;
 
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "Course")
 public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", updatable = false)
     private Long id;
-
-    @Column(name = "name", nullable = false)
     private String name;
+    private String description;
+    private int durationInHours;
 
-    @Column(name = "date", nullable = false)
-    private int date;
+    @ManyToMany(mappedBy = "courses", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    private Set<Student> students;
 
-    @Column(name = "start_hour", nullable = false)
-    private int startHour;
-
-    @Column(name = "end_hour", nullable = false)
-    private int endHour;
-
-    public Course() {}
-
-    public Course(String name, int date, int startHour, int endHour) {
-        this.name = name;
-        this.date = date;
-        this.startHour = startHour;
-        this.endHour = endHour;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getDate() {
-        return date;
-    }
-
-    public void setDate(int day) {
-        this.date = day;
-    }
-
-    public int getStartHour() {
-        return startHour;
-    }
-
-    public void setStartHour(int startHour) {
-        this.startHour = startHour;
-    }
-
-    public int getEndHour() {
-        return endHour;
-    }
-
-    public void setEndHour(int endHour) {
-        this.endHour = endHour;
-    }
 }

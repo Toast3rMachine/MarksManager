@@ -10,6 +10,8 @@ public class MarksmanagerApplication {
 
 		SpringApplication.run(MarksmanagerApplication.class, args);
 
+		//! Pour le Moi du futur, regarde dans AdvancedJpaSpring pour faire ce que tu veux faire
+
 	}
 
 }

@@ -8,13 +8,12 @@ public class Mark {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "value", nullable = false)
     private int value;
 
     @ManyToOne
+    @JoinColumn(name="student_id", nullable = false)
     private Student student;
 
     public Mark() {}
