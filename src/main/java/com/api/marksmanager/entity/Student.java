@@ -29,8 +29,9 @@ public class Student {
 
     private String studentMail;
 
-//    @OneToMany(mappedBy = "student")
-//    private Set<Mark> marks;
+    @OneToMany(mappedBy = "student")
+    @JsonIgnore
+    private Set<Grade> grades;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
