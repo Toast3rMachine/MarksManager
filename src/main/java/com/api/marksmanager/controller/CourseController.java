@@ -25,7 +25,7 @@ public class CourseController {
     private StudentRepository studentRepository;
 
     @PostMapping
-    public ResponseEntity<?> createCourse(@Valid @RequestBody CourseDto courseDto) {
+    public ResponseEntity<?> registerCourse(@Valid @RequestBody CourseDto courseDto) {
 
         if (courseRepository.existsByName(courseDto.getName())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Ce cours existe déjà"));
