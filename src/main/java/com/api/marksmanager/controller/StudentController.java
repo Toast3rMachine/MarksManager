@@ -31,35 +31,10 @@ public class StudentController {
         }
 
         Student student = new Student();
-        student.setFirstName(studentDto.getFirstName());
-        student.setLastName(studentDto.getLastName());
-        student.setAge(studentDto.getAge());
-        student.setStudentMail(studentDto.getStudentMail());
-        if (!studentDto.getCourses().isEmpty()) {
-            Set<Course> courses = new HashSet<>();
-            for (Course course : studentDto.getCourses()) {
-                Course newCourse = new Course();
-
-                if (course.getId() != null) { //* Get a Course by ID if passed in the request
-                    newCourse = courseRepository.findById(course.getId()).get();
-
-                } else if (courseRepository.existsByName(course.getName())) { //* Get a Course if it already exist. Prevent Courses duplication.
-                    newCourse = courseRepository.findByName(course.getName());
-
-                } else { //* Create a new course if not existing
-                    newCourse.setName(course.getName());
-                    newCourse.setDescription(course.getDescription());
-                    newCourse.setDurationInHours(course.getDurationInHours());
-                }
-
-                courses.add(newCourse);
-            }
-            student.setCourses(courses);
+        if (updateStudent(studentDto, student)){
+            return ResponseEntity.ok(new MessageResponse("Nouvel.le étudiant.e enregistré.e avec succès"));
         }
-
-        studentRepository.save(student);
-
-        return ResponseEntity.ok(new MessageResponse("Nouvel.le étudiant.e enregistré.e avec succès"));
+        return ResponseEntity.badRequest().body(new MessageResponse("Veuillez renseigner un cours existant"));
     }
 
     @GetMapping
@@ -80,36 +55,10 @@ public class StudentController {
     public ResponseEntity<?> updateStudent(@PathVariable Long id, @Valid @RequestBody StudentDto studentDto) {
         Student student = studentRepository.findById(id).orElse(null);
         if (student != null) {
-            student.setFirstName(studentDto.getFirstName());
-            student.setLastName(studentDto.getLastName());
-            student.setAge(studentDto.getAge());
-            student.setStudentMail(studentDto.getStudentMail());
-            if (!studentDto.getCourses().isEmpty()) {
-                Set<Course> courses = new HashSet<>();
-                for (Course course : studentDto.getCourses()) {
-                    Course newCourse = new Course();
-
-                    if (course.getId() != null) { //* Get a Course by ID if passed in the request
-                        newCourse = courseRepository.findById(course.getId()).get();
-
-                    } else if (courseRepository.existsByName(course.getName())) { //* Get a Course if it already exist. Prevent Courses duplication.
-                        newCourse = courseRepository.findByName(course.getName());
-
-                    } else { //* Create a new course if not existing
-                        newCourse.setName(course.getName());
-                        newCourse.setDescription(course.getDescription());
-                        newCourse.setDurationInHours(course.getDurationInHours());
-                    }
-
-                    courses.add(newCourse);
-                }
-                student.setCourses(courses);
-            }
-//            if (studentDto.getMarks() != null) {
-//                student.setMarks(studentDto.getMarks());
-//            }
-            studentRepository.save(student);
-            return ResponseEntity.ok().body(new MessageResponse("Etudiant mis à jour avec succès"));
+             if (updateStudent(studentDto, student)){
+                 return ResponseEntity.ok().body(new MessageResponse("Etudiant mis à jour avec succès"));
+             }
+            return ResponseEntity.badRequest().body(new MessageResponse("Veuillez renseigner un cours existant"));
         }
         return ResponseEntity.notFound().build();
     }
@@ -121,5 +70,34 @@ public class StudentController {
             return ResponseEntity.ok().body(new MessageResponse("Etudiant supprimé avec succés"));
         }
         return ResponseEntity.notFound().build();
+    }
+
+    private boolean updateStudent(@RequestBody @Valid StudentDto studentDto, Student student) {
+        student.setFirstName(studentDto.getFirstName());
+        student.setLastName(studentDto.getLastName());
+        student.setAge(studentDto.getAge());
+        student.setStudentMail(studentDto.getStudentMail());
+        if (!studentDto.getCourses().isEmpty() && courseRepository.count() != 0) {
+            Set<Course> courses = new HashSet<>();
+            for (Course course : studentDto.getCourses()) {
+                Course newCourse;
+
+                if (course.getId() != null) { //* Get a Course by ID if passed in the request
+                    newCourse = courseRepository.findById(course.getId()).get();
+
+                } else if (courseRepository.existsByName(course.getName())) { //* Get a Course if it already exist. Prevent Courses duplication.
+                    newCourse = courseRepository.findByName(course.getName());
+
+                } else { //* If a course not exist, return a bad request
+                    return false;
+                }
+
+                courses.add(newCourse);
+            }
+            student.setCourses(courses);
+        }
+
+        studentRepository.save(student);
+        return true;
     }
 }

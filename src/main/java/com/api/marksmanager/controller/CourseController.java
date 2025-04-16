@@ -35,31 +35,6 @@ public class CourseController {
         course.setName(courseDto.getName());
         course.setDescription(courseDto.getDescription());
         course.setDurationInHours(courseDto.getDurationInHours());
-
-        if (!courseDto.getStudents().isEmpty()) {
-            Set<Student> students = new HashSet<>();
-            for (Student student : courseDto.getStudents()) {
-                Student newStudent = new Student();
-
-                if (student.getId() != null) {
-                    newStudent = studentRepository.findById(student.getId()).get();
-                } else if (studentRepository.existsByStudentMail(student.getStudentMail())) {
-                    newStudent = studentRepository.findByFirstName(student.getFirstName()).get();
-                } else {
-                    newStudent.setFirstName(student.getFirstName());
-                    newStudent.setLastName(student.getLastName());
-                    newStudent.setAge(student.getAge());
-                    newStudent.setStudentMail(student.getStudentMail());
-                    Set<Course> courses = new HashSet<>();
-                    courses.add(course);
-                    newStudent.setCourses(courses);
-                    studentRepository.save(newStudent);
-                }
-                students.add(newStudent);
-            }
-            course.setStudents(students);
-        }
-
         courseRepository.save(course);
 
         return ResponseEntity.ok().body(new MessageResponse("Nouveau cours enregistré avec succès"));
@@ -88,24 +63,18 @@ public class CourseController {
             course.setDurationInHours(courseDto.getDurationInHours());
 
             if (!courseDto.getStudents().isEmpty()) {
-                System.out.println("Entré dans la condition");
                 Set<Student> students = new HashSet<>();
                 for (Student student : courseDto.getStudents()) {
-                    Student newStudent = studentRepository.findById(student.getId()).get();
-                    System.out.println(student.getId());
+                    Student newStudent;
 
-                    if (student.getId() != null) {
-                        System.out.println(1);
+                    if (student.getId() != null) { //* Get Student by ID if passed in the request
                         newStudent = studentRepository.findById(student.getId()).get();
-                    } else if (studentRepository.existsByStudentMail(student.getStudentMail())) {
-                        System.out.println(2);
+
+                    } else if (studentRepository.existsByStudentMail(student.getStudentMail())) { //* Get a Student by email
                         newStudent = studentRepository.findByFirstName(student.getFirstName()).get();
-                    } else {
-                        System.out.println(3);
-                        newStudent.setFirstName(student.getFirstName());
-                        newStudent.setLastName(student.getLastName());
-                        newStudent.setAge(student.getAge());
-                        newStudent.setStudentMail(student.getStudentMail());
+
+                    } else { //* If a student not exist, return a bad request
+                        return ResponseEntity.badRequest().body(new MessageResponse("Veuillez renseigné un étudiant existant"));
                     }
                     Set<Course> courses = new HashSet<>(newStudent.getCourses());
                     courses.add(course);

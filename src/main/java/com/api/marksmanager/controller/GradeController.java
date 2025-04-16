@@ -33,13 +33,7 @@ public class GradeController {
     public ResponseEntity<?> registerGrade(@Valid @RequestBody GradeDto gradeDto) {
 
         Grade grade = new Grade();
-        grade.setGrade(gradeDto.getGrade());
-
-        Optional<Student> student = studentRepository.findById(gradeDto.getStudentId());
-        student.ifPresent(grade::setStudent);
-
-        Optional<Course> course = courseRepository.findById(gradeDto.getCourseId());
-        course.ifPresent(grade::setCourse);
+        updateGrade(gradeDto, grade);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(gradeRepository.save(grade));
     }
@@ -69,11 +63,7 @@ public class GradeController {
     public ResponseEntity<?> updateGrade(@PathVariable Long id, @Valid @RequestBody GradeDto gradeDto) {
         Grade grade = gradeRepository.findById(id).orElse(null);
         if (grade != null) {
-            grade.setGrade(gradeDto.getGrade());
-            Optional<Student> student = studentRepository.findById(gradeDto.getStudentId());
-            student.ifPresent(grade::setStudent);
-            Optional<Course> course = courseRepository.findById(gradeDto.getCourseId());
-            course.ifPresent(grade::setCourse);
+            updateGrade(gradeDto, grade);
             gradeRepository.save(grade);
             return ResponseEntity.status(HttpStatus.OK).body(grade);
         }
@@ -87,5 +77,15 @@ public class GradeController {
             return ResponseEntity.status(HttpStatus.OK).build();
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    private void updateGrade(@RequestBody @Valid GradeDto gradeDto, Grade grade) {
+        grade.setGrade(gradeDto.getGrade());
+
+        Optional<Student> student = studentRepository.findById(gradeDto.getStudentId());
+        student.ifPresent(grade::setStudent);
+
+        Optional<Course> course = courseRepository.findById(gradeDto.getCourseId());
+        course.ifPresent(grade::setCourse);
     }
 }
